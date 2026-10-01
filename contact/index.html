@@ -64,7 +64,7 @@
   .brand-word{ font-family: var(--serif); font-weight:700; font-size:1.18rem; line-height:1; color: var(--paper); }
   .brand-word .g{ color: var(--gold-bright); }
   .brand-word small{ display:block; font-family: var(--sans); font-weight:600; font-size:.55rem; letter-spacing:.16em; color: rgba(244,239,228,.55); margin-top:.4em; }
-  nav.links{ display:flex; gap:28px; }
+  nav.links{ display:flex; gap:28px; align-items:center; }
   nav.links a{ font-size:.87rem; font-weight:500; color: rgba(244,239,228,.82); transition: color .2s; }
   nav.links a:hover{ color: var(--gold-bright); }
   .nav-cta{ display:flex; align-items:center; gap:18px; }
@@ -464,7 +464,8 @@
         Response times are typically within one business day.
       </p>
     </div>
-    <form class="form-card" action="mailto:info@nassauroofingexperts.com" method="GET" enctype="text/plain">
+    <form class="form-card" action="https://api.web3forms.com/submit" method="POST">
+      <input type="hidden" name="access_key" value="8c2f1860-5ad7-49a8-97b9-9afcf2d9d21b">
       <p class="eyebrow" style="margin-bottom:6px;">Tell Us About Your Project</p>
       <p style="color:var(--ink-soft); font-size:.9rem; margin-bottom:20px;">The more you share, the better we can prepare for the first conversation.</p>
       <div class="form-grid">
@@ -578,8 +579,59 @@
       });
     } catch(e){}
   })();
+  (function(){
+    try {
+      var forms = document.querySelectorAll('form');
+      forms.forEach(function(form) {
+        if (form.getAttribute('action') === 'https://api.web3forms.com/submit') {
+          form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var formData = new FormData(form);
+            var object = {};
+            formData.forEach(function(value, key){
+                object[key] = value;
+            });
+            var json = JSON.stringify(object);
+            var submitBtn = form.querySelector('button[type="submit"]');
+            var originalText = submitBtn ? submitBtn.innerText : 'Submit';
+            if (submitBtn) submitBtn.innerText = 'Sending...';
+
+            fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: json
+            })
+            .then(function(response) {
+                return response.json().then(function(resJson) {
+                    if (response.status == 200) {
+                        alert("Thank you for reaching out to us. We'll review your submission and get back to you soon.");
+                        form.reset();
+                    } else {
+                        console.log(response);
+                        alert("Something went wrong. Please try again.");
+                    }
+                });
+            })
+            .catch(function(error) {
+                console.log(error);
+                alert("Something went wrong. Please try again.");
+            })
+            .finally(function() {
+                if (submitBtn) submitBtn.innerText = originalText;
+            });
+          });
+        }
+      });
+    } catch(e){}
+  })();
 </script>
 </body>
 </html>
+
+
+
 
 
